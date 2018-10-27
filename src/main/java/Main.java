@@ -1,26 +1,52 @@
+import org.jsoup.Jsoup;
 import util.Document;
 import util.DocumentCollection;
+import util.NLP;
 
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
-import java.io.IOException;
 import java.util.Map;
 
 public class Main {
 
-    private static String fileToString(File file) {
-        StringBuilder contentBuilder = new StringBuilder();
-        try {
-            BufferedReader in = new BufferedReader(new FileReader(file));
-            String str;
-            while ((str = in.readLine()) != null) {
-                contentBuilder.append(str);
-            }
-            in.close();
-        } catch (IOException e) {
+    public static void main(String args[]) throws Exception {
+        validateRequirements();
+        NLP nlp = getNLP(args);
+
+        DocumentCollection dc = new DocumentCollection();
+
+        long startTime = System.currentTimeMillis();
+
+        File[] listOfFiles = new File("collection/").listFiles();
+        for (File file : listOfFiles) {
+            String fileString = fileToString(file);
+            org.jsoup.nodes.Document doc = Jsoup.parse(fileString);
+            String text = doc.select("TEXT").first().html();
+            dc.addDocument(new Document(text, nlp));
         }
-        return contentBuilder.toString();
+
+        long endTime = System.currentTimeMillis();
+
+        System.out.println("Time program took to acquire the text characteristics: " + (endTime - startTime) + " milliseconds");
+
+        dc.parse();
+
+        printStats(dc);
+    }
+
+    private static String fileToString(File file) throws Exception {
+        try (BufferedReader br = new BufferedReader(new FileReader(file))) {
+            StringBuilder sb = new StringBuilder();
+            String line = br.readLine();
+
+            while (line != null) {
+                sb.append(line);
+                sb.append(System.lineSeparator());
+                line = br.readLine();
+            }
+            return sb.toString();
+        }
     }
 
     private static void printStats(DocumentCollection dc) {
@@ -39,24 +65,21 @@ public class Main {
         System.out.println("average number of tokens per document: " + dc.getAverageTokensPerDocument());
     }
 
-    public static void main(String args[]) {
-        Boolean enablePorterStemmer = args.length == 1 && args[0].equals("enablePorterStemmer");
+    private static void validateRequirements() {
+        if (!System.getProperty("java.version").substring(0,3).equals("1.8")) {
+            System.out.println("Stanford NLP libraries requires java 1.8");
+            System.out.println("current version: " + System.getProperty("java.version"));
+            System.exit(0);
+        }
+    }
 
-        DocumentCollection dc = new DocumentCollection();
+    private static NLP getNLP(String[] args) {
+        NLP nlp = NLP.NONE;
 
-        long startTime = System.currentTimeMillis();
-
-        File[] listOfFiles = new File("collection/").listFiles();
-        for (File file : listOfFiles) {
-            dc.addDocument(new Document(fileToString(file), enablePorterStemmer));
+        if (args.length != 0) {
+            nlp = NLP.valueOf(args[0]);
         }
 
-        long endTime = System.currentTimeMillis();
-
-        System.out.println("Time program took to acquire the text characteristics: " + (endTime - startTime) + " milliseconds");
-
-        dc.parse();
-
-        printStats(dc);
+        return nlp;
     }
 }

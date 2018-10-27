@@ -2,4 +2,5 @@
 target/
 *.iml
 
+.java-version
 .DS_Store
