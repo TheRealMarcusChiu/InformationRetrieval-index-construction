@@ -19,7 +19,7 @@ public class StanfordLemmatizer {
             // (required for lemmatization), and lemmatization
             Properties props;
             props = new Properties();
-            props.put("annotators", "tokenize,ssplit,pos,lemma,ner");
+            props.put("annotators", "tokenize,ssplit,pos,lemma"); // tokenize,ssplit,pos,lemma,ner,parse,depparse,coref,kbp,quote
 
             /*
              * This is a pipeline that takes in a string and returns various analyzed linguistic forms.
