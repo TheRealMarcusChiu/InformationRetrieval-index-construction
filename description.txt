@@ -1,0 +1,31 @@
+Index_Version1.uncompress: 8456006758
+Index_Version1.compressed: 8550952375
+Index_Version2.uncompress: 604680730
+Index_Version2.compressed: 684981599
+
+- the size of the index Version 1 uncompressed (in bytes), 2 points : 474,768 bytes
+- the size of the index Version 2 uncompressed (in bytes), 2 points : 459,623 bytes
+- the size of the index Version 1 compressed (in bytes), 2 points   : 279,933 bytes
+- the size of the index Version 2 compressed (in bytes), 2 points   : 220,819 bytes
+
+- the number of inverted lists in each version of the index, (2 points per index version)
+  version1: 5490
+  version2: 4504
+
+- the df, tf, and inverted list length (in bytes) for the terms: (used Version1.uncompress)
+  "reynolds":   df=3 tf=4       bytes=12
+  "nasa":       df=7 tf=7       bytes=27
+  "prandtl":    df=63 tf=80     bytes=261
+  "flow":       df=680 tf=1705  bytes=2,873
+  "pressure":   df=529 tf=1228  bytes=2,233
+  "boundary":   df=457 tf=998   bytes=1,934
+  "shock":      df=235 tf=661   bytes=999
+
+
+- the df, for “NASA” as well as the tf, the doclen and the max_tf, for the first 3 entries in its posting list. (10 points : 1 point for the df of “NASA”, 1 point for the tf in first document of the posting file of “NASA”, 1 point for the doclen of the fist document in the posting file and 1 point for the max-tf of the doclen and the max_tf, and so on)
+  "nasa":       df=7 tf=7
+- the dictionary term from index 1 with the largest df (2 points) and the dictionary term with the lowest df (2 points) – if more than one list them all!!!
+- the stem from index 2 with the largest df (2 points) and the dictionary term with the lowest df (2 points) – if more than one list them all!!!
+- the document with the largest max_tf in collection (4 points) and the document with the largest doclen in the collection (5 points)
+  maxTermFrequency = 26
+  maxDocLength = 644
