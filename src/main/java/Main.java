@@ -1,11 +1,9 @@
 import util.DocumentCollection;
 import util.NLP;
-import util.construction.Encoding;
 import util.construction.IndexConstruction;
 import util.construction.PostingsCompressionType;
 
 import java.io.File;
-import java.util.ArrayList;
 
 public class Main {
 
@@ -15,14 +13,15 @@ public class Main {
         File[] listOfFiles = new File("collection/").listFiles();
         DocumentCollection dc;
 
-//        dc = new DocumentCollection(listOfFiles, NLP.STANFORD_LEMMATIZER);
-//
-//        new IndexConstruction(dc, "Index_Version1.uncompress")
-//                .buildIndex();
-//
-//        new IndexConstruction(dc, "Index_Version1.compressed")
-//                .withPostingsCompressionType(PostingsCompressionType.GAMMA)
-//                .buildIndex();
+        dc = new DocumentCollection(listOfFiles, NLP.STANFORD_LEMMATIZER);
+
+        new IndexConstruction(dc, "Index_Version1.uncompress")
+                .buildIndex();
+
+        new IndexConstruction(dc, "Index_Version1.compressed")
+                .withPostingsCompressionType(PostingsCompressionType.GAMMA)
+                .withDictionaryBlockingCompression(8)
+                .buildIndex();
 
         dc = new DocumentCollection(listOfFiles, NLP.PORTER_STEMMER);
 

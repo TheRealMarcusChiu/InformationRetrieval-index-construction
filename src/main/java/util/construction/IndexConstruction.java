@@ -19,7 +19,7 @@ public class IndexConstruction {
     public IndexConstruction(DocumentCollection dc, String fileName) {
         this.dc = dc;
         this.fileName = "index/" + fileName;
-        this.dictionaryBlockingNumber = 0;
+        this.dictionaryBlockingNumber = -1;
         this.postingsCompressionType = PostingsCompressionType.NONE;
         this.dictionaryCompressionFrontCoding = false;
     }
@@ -41,12 +41,31 @@ public class IndexConstruction {
 
     public void buildIndex() throws Exception {
         try (PrintWriter out = new PrintWriter(fileName)) {
+            StringBuilder onelineVocabulary = new StringBuilder();
+            Integer kCount = 0;
+
             for (Map.Entry<String, DictionaryEntry> entry : dc.getDictionaryEntries().entrySet()) {
                 DictionaryEntry de = entry.getValue();
-                out.println(de.getTerm() + " " +
+
+                String termField = de.getTerm();
+                if (dictionaryBlockingNumber != -1) {
+                    int vocabBeforeSize = onelineVocabulary.length();
+                    onelineVocabulary.append(Integer.toString(termField.length())).append(termField);
+                    if (kCount.equals(this.dictionaryBlockingNumber)) {
+                        termField = Integer.toString(vocabBeforeSize);
+                        kCount = 0;
+                    } else {
+                        termField = "";
+                        kCount++;
+                    }
+                }
+                out.println(termField + " " +
                         de.getDocumentIDs().size() + " " +
                         de.getTermFrequency() + " " +
                         posting(de.getDocumentIDs(), this.postingsCompressionType));
+            }
+            if (dictionaryBlockingNumber != -1) {
+                out.print(onelineVocabulary.toString());
             }
             for (Document d : dc.getDocuments()) {
                 out.println(d.getMax_tf() + " " + d.getDocLength());

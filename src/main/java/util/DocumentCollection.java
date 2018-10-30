@@ -68,7 +68,7 @@ public class DocumentCollection {
         this.dictionaryEntries = this.dictionaryEntries
                 .entrySet()
                 .stream()
-                .sorted(Collections.reverseOrder(Map.Entry.comparingByKey()))
+                .sorted(Map.Entry.comparingByKey())
                 .collect(toMap(Map.Entry::getKey, Map.Entry::getValue, (e1, e2) -> e2, LinkedHashMap::new));
     }
 }
