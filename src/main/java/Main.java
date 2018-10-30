@@ -30,6 +30,7 @@ public class Main {
 
         new IndexConstruction(dc, "Index_Version2.compressed")
                 .withPostingsCompressionType(PostingsCompressionType.DELTA)
+                .withDictionaryBlockingAndFrontCoding(8)
                 .buildIndex();
     }
 

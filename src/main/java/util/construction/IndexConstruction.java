@@ -34,26 +34,117 @@ public class IndexConstruction {
         return this;
     }
 
-    public IndexConstruction withDictionaryFrontCoding() {
+    public IndexConstruction withDictionaryBlockingAndFrontCoding(Integer k) {
+        this.dictionaryBlockingNumber = k;
         this.dictionaryCompressionFrontCoding = true;
         return this;
+    }
+
+    private Integer find(String num1, String num2) {
+        Integer count = 0;
+        for(int i = 0; i < num1.length() && i < num2.length(); i++) {
+            if(num1.charAt(i) == num2.charAt(i)){
+                count++;
+            } else {
+                break;
+            }
+        }
+        return count;
     }
 
     public void buildIndex() throws Exception {
         try (PrintWriter out = new PrintWriter(fileName)) {
             StringBuilder onelineVocabulary = new StringBuilder();
-            Integer kCount = 0;
+            Integer kCount = dictionaryBlockingNumber;
 
+            ArrayList<DictionaryEntry> entries  = new ArrayList<>();
             for (Map.Entry<String, DictionaryEntry> entry : dc.getDictionaryEntries().entrySet()) {
-                DictionaryEntry de = entry.getValue();
+                entries.add(entry.getValue());
+            }
+
+            Boolean is = false;
+            Boolean isSuffix = false;
+            String previous = "";
+            for (int i = 0; i < entries.size(); i++) {
+                DictionaryEntry de = entries.get(i);
 
                 String termField = de.getTerm();
                 if (dictionaryBlockingNumber != -1) {
+
+                    if (dictionaryCompressionFrontCoding) {
+                        if (!is) {
+                            if (termField.length() >= 4) {
+                                if ((i+1) < entries.size()) {
+                                    String nextTerm = entries.get(i+1).getTerm();
+                                    if (nextTerm.length() >= 4) {
+                                        Integer ii = find(termField, nextTerm);
+                                        if (ii >= 4) {
+                                            previous = termField.substring(0, ii);
+                                            is = true;
+                                            isSuffix = false;
+                                            termField = previous + "*" + termField.substring(ii);
+                                        } else {
+                                            is = false;
+                                            isSuffix = false;
+                                        }
+                                    } else {
+                                        is = false;
+                                        isSuffix = false;
+                                    }
+                                } else {
+                                    is = false;
+                                    isSuffix = false;
+                                }
+                            } else {
+                                is = false;
+                                isSuffix = false;
+                            }
+                        } else {
+                            Integer iit = find(previous, termField);
+                            if (iit >= previous.length()) {
+                                termField = termField.substring(iit);
+                                isSuffix = true;
+                            } else {
+                                if (termField.length() >= 4) {
+                                    if ((i+1) < entries.size()) {
+                                        String nextTerm = entries.get(i+1).getTerm();
+                                        if (nextTerm.length() >= 4) {
+                                            Integer ii = find(termField, nextTerm);
+                                            if (ii >= 4) {
+                                                previous = termField.substring(0, ii);
+                                                is = true;
+                                                isSuffix = false;
+                                                termField = previous + "*" + termField.substring(ii);
+                                            } else {
+                                                is = false;
+                                                isSuffix = false;
+                                            }
+                                        } else {
+                                            is = false;
+                                            isSuffix = false;
+                                        }
+                                    } else {
+                                        is = false;
+                                        isSuffix = false;
+                                    }
+                                } else {
+                                    is = false;
+                                    isSuffix = false;
+                                }
+                            }
+                        }
+                    }
+
                     int vocabBeforeSize = onelineVocabulary.length();
-                    onelineVocabulary.append(Integer.toString(termField.length())).append(termField);
-                    if (kCount.equals(this.dictionaryBlockingNumber)) {
+                    int size = termField.contains("*") ? termField.length() - 1 : termField.length();
+                    onelineVocabulary.append(Integer.toString(size));
+                    if (isSuffix) {
+                        onelineVocabulary.append("◊");
+                    }
+                    onelineVocabulary.append(termField);
+                    if (kCount.equals(dictionaryBlockingNumber)) {
                         termField = Integer.toString(vocabBeforeSize);
-                        kCount = 0;
+                        kCount = 1;
                     } else {
                         termField = "";
                         kCount++;
