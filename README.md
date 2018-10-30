@@ -1,5 +1,5 @@
 How to run this project
-- download java 8 or higher, i am using java 10
+- REQUIRES java 8
 - download maven 
 
 - mvn clean package
